@@ -1,0 +1,129 @@
+import csv
+class Node:
+
+  def __init__(self, siape, nome):
+    self.siape = siape
+    self.nome = nome
+    self.left = None
+    self.right = None
+
+
+class BinaryTree:
+
+  def __init__(self):
+    self.root = None
+    self.comparisons = 0
+
+  def insert(self, siape, nome):
+    self.root = self._insert(self.root, siape, nome)
+
+  def _insert(self, root, siape, nome):
+    if root is None:
+      return Node(siape, nome)
+
+    if siape < root.siape:
+      root.left = self._insert(root.left, siape, nome)
+    elif siape > root.siape:
+      root.right = self._insert(root.right, siape, nome)
+
+    return root
+
+  def search(self, siape, nome):
+    self.comparisons = 0
+    return self._search(self.root, siape, nome)
+
+  def _search(self, root, siape, nome):
+    if root is None or root.siape == siape:
+      return root
+
+    self.comparisons += 1
+
+    if siape < root.siape:
+      return self._search(root.left, siape, nome)
+    return self._search(root.right, siape, nome)
+
+  def remove(self, siape):
+    self.root = self._remove(self.root, siape)
+
+  def _remove(self, root, siape):
+    if root is None:
+      return root
+
+    if siape < root.siape:
+      root.left = self._remove(root.left, siape)
+    elif siape > root.siape:
+      root.right = self._remove(root.right, siape)
+    else:
+      if root.left is None:
+        return root.right
+      elif root.right is None:
+        return root.left
+
+      root.siape = self._min_value_node(root.right).siape
+      root.right = self._remove(root.right, root.siape)
+
+    return root
+
+  def _min_value_node(self, node):
+    current = node
+    while current.left is not None:
+      current = current.left
+    return current
+
+  def in_order_traversal(self, root, result):
+    if root:
+      self.in_order_traversal(root.left, result)
+      result.append({'siape': root.siape, 'nome': root.nome})
+      self.in_order_traversal(root.right, result)
+
+  def carregar_arvore_binaria_de_csv(dados_para_a_busca_binária_csv):
+    tree = BinaryTree()
+    with open(dados_para_a_busca_binária_csv, 'r', newline='') as file:
+      reader = csv.DictReader(file)
+    for row in reader:
+      siape = int(row['SIAPE'])
+      nome = row['Nome']
+      tree.insert(siape, nome)
+    return tree
+
+
+tree = BinaryTree()
+data = [(53062, 'Alfredo Lazera'), (25252, 'José Carlos'), (18241, 'Remover'),
+        (32067, 'Remover')]
+for siape, nome in data:
+  tree.insert(siape, nome)
+
+# Verificação de existência e contagem de comparações
+search_result = tree.search(53062, 'Alfredo Lazera')
+print(f'Alfredo Lazera na árvore: {search_result is not None}')
+print(f'Comparações realizadas: {tree.comparisons}')
+
+search_result = tree.search(25252, 'José Carlos')
+print(f'José Carlos na árvore: {search_result is not None}')
+print(f'Comparações realizadas: {tree.comparisons}')
+
+# Remoção e salvamento do arquivo csv
+tree.remove(18241)
+tree.remove(32067)
+
+result_after_removal = []
+tree.in_order_traversal(tree.root, result_after_removal)
+# Salve result_after_removal em um arquivo csv
+
+# Inserção e salvamento do arquivo csv
+tree.insert(32067, 'Inserir novamente')
+result_after_insertion = []
+tree.in_order_traversal(tree.root, result_after_insertion)
+
+
+# Salve result_after_insertion em um arquivo csv
+# Carrega dados da árvore a partir de um arquivo CSV
+def carregar_arvore_binaria_de_csv(arquivo_csv):
+  tree = BinaryTree()
+  with open(arquivo_csv, 'r', newline='') as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+      siape = int(row['SIAPE'])
+      nome = row['Nome']
+      tree.insert(siape, nome)
+  return tree
