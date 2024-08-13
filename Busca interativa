@@ -1,0 +1,77 @@
+class Fila:
+
+  def __init__(self):
+    self._tamanho = 0
+    self._inicio = None
+    self._fim = None
+
+  def adicionar(self, elemento):
+    novo_no = No(elemento)
+    if self._tamanho == 0:
+      self._inicio = novo_no
+      self._fim = novo_no
+    else:
+      self._fim.proximo = novo_no
+      self._fim = novo_no
+    self._tamanho += 1
+
+  def remover(self):
+    if self._tamanho == 0:
+      raise IndexError("A fila está vazia, não é possível remover.")
+
+    elemento_removido = self._inicio.valor
+    self._inicio = self._inicio.proximo
+    self._tamanho -= 1
+
+    if self._tamanho == 0:
+      self._fim = None
+
+    return elemento_removido
+
+  def __getitem__(self, indice):
+    if indice < 0 or indice >= self._tamanho:
+      raise IndexError("Índice fora dos limites da fila.")
+
+    no_atual = self._inicio
+    for _ in range(indice):
+      no_atual = no_atual.proximo
+
+    return no_atual.valor
+
+  def __len__(self):
+    return self._tamanho
+
+  def getitem_input(self):
+    posicao = int(
+        input("Digite uma posição para verificar se está na lista: "))
+    try:
+      valor = self[posicao]
+      print(f"Elemento na posição {posicao}: {valor}")
+    except IndexError as e:
+      print(e)
+
+
+class No:
+
+  def __init__(self, valor):
+    self.valor = valor
+    self.proximo = None
+
+
+fila = Fila()
+
+num_elementos = int(input("Quantos elementos deseja adicionar? "))
+for _ in range(num_elementos):
+  valor = int(input("Digite o valor a ser adicionado: "))
+  fila.adicionar(valor)
+
+print("\nValores na fila:")
+for i in range(len(fila)):
+  print(fila[i], end=' ')
+
+elemento_removido = fila.remover()
+print("\nElemento removido:", elemento_removido)
+
+print("Tamanho atual da fila:", len(fila))
+
+fila.getitem_input()
